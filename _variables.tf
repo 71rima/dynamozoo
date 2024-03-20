@@ -18,3 +18,11 @@ variable "region" {
   type        = string
   description = "The AWS region used for the project."
 }
+variable "s3_logsbucket" {
+  type = string
+  description = "The name of the s3 cflogsbucket."
+}
+variable "dynamodb_statelock" {
+  type = string
+  description = "The name of the dynamodb table used for Terraform state lock."
+}

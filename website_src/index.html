@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+       
+    </head>
+
+    <body>
+        <h1>Choose image name to request</h1> 
+        <p><div>
+            <label for="first">Image name:</label>
+            <select id="first" name="first">
+              <option value="" selected="selected">Select image.</option>
+            </select>
+          </div></p>
+        <button onclick="myFunction()">Request image</button>
+
+        <script>
+            function myFunction() {
+              document.getElementById("demo").innerHTML = "Hello World";
+            }
+        </script>
+        <script>
+            let data = [{
+                item: 'Scurr' , item: 'Dog' , item: 'Cat'}
+            ];
+        window.onload = function() {
+            var itemSel = document.getElementById("first");
+            for (var x in data) {
+              itemSel.options[itemSel.options.length] = new Option(data[x].item, x); //TODO: change
+            }
+          }
+        </script>
+        </centered>
+    </body>
+
+
+
+
+
+</html>

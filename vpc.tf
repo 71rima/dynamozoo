@@ -1,3 +1,4 @@
+/*
 module "vpc" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=e4768508a17f79337f9f1e48ebf47ee885b98c1f"
 
@@ -12,6 +13,6 @@ module "vpc" {
 
   enable_nat_gateway = true
 }
-
+*/
 
 

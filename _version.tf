@@ -22,7 +22,7 @@ provider "aws" {
   default_tags {
     tags = {
       owner       = "TecRacer"
-      project     = "dynamozoo"
+      project     = local.project_name
       Environment = "Dev"
       Terraform   = true
     }

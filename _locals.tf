@@ -7,5 +7,6 @@ locals {
   public_subnets   = ["10.0.0.0/24", "10.0.1.0/24"]
   database_subnets = ["10.0.4.0/24", "10.0.5.0/24"]
 
+  s3_origin_id = aws_s3_bucket.static_website.id
 
 }

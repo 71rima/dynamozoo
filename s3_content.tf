@@ -1,32 +1,29 @@
 resource "aws_s3_bucket" "content" {
-  bucket = "dynamozoo-content14412"
-
-  tags = {
-    Name = "s3_content"
-  }
+  bucket = var.s3_content_bucket_name
 }
 
 resource "aws_s3_object" "image_scurr" {
-  bucket = aws_s3_bucket.content.id
-  key    = "image_scurr.jpg"
+  bucket       = aws_s3_bucket.content.id
+  key          = "image_scurr.jpg"
+  content_type = "image/jpeg"
+  source       = "${var.content_source_path}/scurr.jpg"
 
-  source = "${path.module}/s3_content_images/scurr.jpg"
-
-  etag = filemd5("${path.module}/s3_content_images/scurr.jpg")
+  etag = filemd5("${var.content_source_path}/scurr.jpg")
 }
 resource "aws_s3_object" "image_dog" {
-  bucket = aws_s3_bucket.content.id
-  key    = "image_dog.jpg"
+  bucket       = aws_s3_bucket.content.id
+  key          = "image_dog.jpg"
+  content_type = "image/jpeg"
+  source       = "${var.content_source_path}/dog.jpg"
 
-  source = "${path.module}/s3_content_images/dog.jpg"
+  etag = filemd5("${var.content_source_path}/dog.jpg")
 
-  etag = filemd5("${path.module}/s3_content_images/dog.jpg")
 }
 resource "aws_s3_object" "image_cat" {
-  bucket = aws_s3_bucket.content.id
-  key    = "image_cat.jpg"
+  bucket       = aws_s3_bucket.content.id
+  key          = "image_cat.jpg"
+  content_type = "image/jpeg"
+  source       = "${var.content_source_path}/cat.jpg"
 
-  source = "${path.module}/s3_content_images/cat.jpg"
-
-  etag = filemd5("${path.module}/s3_content_images/cat.jpg")
+  etag = filemd5("${var.content_source_path}/cat.jpg")
 }

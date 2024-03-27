@@ -1,10 +1,5 @@
 resource "aws_s3_bucket" "static_website" {
-  bucket = "dynamozoo-website14412"
-
-  tags = {
-    Name = "static_website"
-  }
-
+  bucket = var.s3_website_bucket_name
 }
 resource "aws_s3_bucket_ownership_controls" "static_website" {
   bucket = aws_s3_bucket.static_website.id
@@ -41,7 +36,7 @@ resource "aws_s3_bucket_website_configuration" "static_website" {
 resource "aws_s3_object" "index" {
   bucket       = aws_s3_bucket.static_website.id
   key          = "index.html"
-  source       = "${path.module}/website_src/index.html"
+  source       = "${path.module}/website_src/index.html" #TODO: Variable oder so lassen?
   content_type = "text/html"
 
   etag = filemd5("${path.module}/website_src/index.html")
@@ -60,7 +55,7 @@ resource "aws_s3_bucket_policy" "static_website_allow_oac" {
   bucket = aws_s3_bucket.static_website.id
   policy = data.aws_iam_policy_document.static_website.json
 }
-
+#TODO: Template file https://developer.hashicorp.com/terraform/language/functions/templatefile
 data "aws_iam_policy_document" "static_website" {
   statement {
     sid       = "AllowOACReadAccess"

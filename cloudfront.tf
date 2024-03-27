@@ -7,7 +7,7 @@ resource "aws_cloudfront_origin_access_control" "this" {
 }
 
 resource "aws_cloudfront_distribution" "my_distribution" {
-  #TODO: CF Function + Aliases + function association
+
   origin {
     domain_name              = aws_s3_bucket.static_website.bucket_regional_domain_name
     origin_id                = aws_s3_bucket.static_website.bucket_regional_domain_name
@@ -21,7 +21,7 @@ resource "aws_cloudfront_distribution" "my_distribution" {
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
-    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" #TODO local CachingDisabled Managed Policy from AWS
+    cache_policy_id        = data.aws_cloudfront_cache_policy.cacheDisabled.id #CachingDisabled Managed Policy from AWS
 
   }
   restrictions {
@@ -30,16 +30,42 @@ resource "aws_cloudfront_distribution" "my_distribution" {
     }
   }
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = false
+    acm_certificate_arn            = data.aws_acm_certificate.this.arn
+    ssl_support_method             = "sni-only" #must be set; other options "vip" include extra charges because cf need to use a dedicated ip adress
   }
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-
   logging_config {
     bucket = "${data.aws_s3_bucket.logs.id}.s3.amazonaws.com"
     prefix = "cflogs-"
   }
+  aliases = [var.domain, var.domain_www]
 }
 
-#Origin Access Controll - prefered above OAI (Short Term Credentials, more versatile)
+# Route53 Record - Routes traffic to Cloudfront CNAME Record
+
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = var.domain_www
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.my_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.my_distribution.hosted_zone_id
+    evaluate_target_health = false
+  }
+
+}
+resource "aws_route53_record" "root" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = var.domain
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.my_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.my_distribution.hosted_zone_id
+    evaluate_target_health = false
+  }
+}

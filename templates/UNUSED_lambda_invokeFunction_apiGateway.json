@@ -1,0 +1,34 @@
+{
+    "Version": "2012-10-17",
+    "Id": "default",
+    "Statement": [
+      {
+        "Sid": "8b8d482a-cbb0-56db-83ef-b8dd5abdb05e",
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "apigateway.amazonaws.com"
+        },
+        "Action": "lambda:InvokeFunction",
+        "Resource": "arn:aws:lambda:us-east-1:870615114862:function:FileService",
+        "Condition": {
+          "ArnLike": {
+            "AWS:SourceArn": "arn:aws:execute-api:us-east-1:870615114862:yrwq2lf640/*/GET/*"
+          }
+        }
+      },
+      {
+        "Sid": "ih",
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "apigateway.amazonaws.com"
+        },
+        "Action": "lambda:InvokeFunction",
+        "Resource": "arn:aws:lambda:us-east-1:870615114862:function:FileService",
+        "Condition": {
+          "ArnLike": {
+            "AWS:SourceArn": "arn:aws:execute-api:us-east-1:870615114862:yrwq2lf640/*/GET/{animal}"
+          }
+        }
+      }
+    ]
+  }

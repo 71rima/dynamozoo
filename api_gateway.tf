@@ -51,12 +51,45 @@ resource "aws_api_gateway_deployment" "this" {
       aws_api_gateway_rest_api.FileService.body,
       aws_api_gateway_resource.animalResource.id,
       aws_api_gateway_method.getAnimal.id,
-      aws_api_gateway_integration.integration.id,
+      aws_api_gateway_integration.integration.id
+    
     ]))
-  } 
-  
-  depends_on = [aws_api_gateway_integration.integration]    
+  }
+
+  depends_on = [aws_api_gateway_integration.integration]
   lifecycle {
     create_before_destroy = true
   }
+}
+
+#Regional (ACM Certificate) for domain "api.web.elshennawy.de"
+resource "aws_api_gateway_domain_name" "this" {
+  domain_name              = "api.web.elshennawy.de"
+  regional_certificate_arn = aws_acm_certificate_validation.this.certificate_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  #depends_on = [aws_acm_certificate_validation.this.certificate_arn]
+}
+
+#Route 53 DNS Record for domain "api.web.elshennawy.de"
+resource "aws_route53_record" "api_gateway_record" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = aws_api_gateway_domain_name.this.domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_api_gateway_domain_name.this.regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.this.regional_zone_id
+    evaluate_target_health = true
+  }
+}
+
+# Base path mapping for domain "api.web.elshennawy.de"
+resource "aws_api_gateway_base_path_mapping" "this" {
+  api_id      = aws_api_gateway_rest_api.FileService.id
+  stage_name  = aws_api_gateway_stage.dev.stage_name
+  domain_name = aws_api_gateway_domain_name.this.domain_name
 }

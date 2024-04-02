@@ -4,12 +4,6 @@ data "aws_route53_zone" "this" {
   private_zone = false
 }
 
-#find acm certificate
-data "aws_acm_certificate" "this" {
-  domain   = "www.web.elshennawy.de"
-  statuses = ["ISSUED"]
-}
-
 #find CloudFront AWS managed Cache policy "CachingDisabled"
 data "aws_cloudfront_cache_policy" "cacheDisabled" {
   name = "Managed-CachingDisabled"

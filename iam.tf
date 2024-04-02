@@ -36,7 +36,7 @@ resource "aws_iam_role" "lambda_iam_role" {
 resource "aws_lambda_permission" "allow_apiGateway_invokeFunction" {
   statement_id   = "AllowExecutionFromApiGateway"
   action         = "lambda:InvokeFunction"
-  function_name  = "arn:aws:lambda:us-east-1:${var.account_id}:function:FileServiceDev" #var.accountid oder data.aws_caller_identity.current.id
+  function_name  = "arn:aws:lambda:${var.region}:${var.account_id}:function:${var.lambda_function_name}" #var.accountid oder data.aws_caller_identity.current.id
   principal      = "apigateway.amazonaws.com"
   source_account = var.account_id
   source_arn     = "arn:aws:execute-api:${var.region}:${var.account_id}:${aws_api_gateway_rest_api.FileService.id}/*/${aws_api_gateway_method.getAnimal.http_method}${aws_api_gateway_resource.animalResource.path}"

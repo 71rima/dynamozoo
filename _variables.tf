@@ -8,10 +8,6 @@ variable "account_id" {
   description = "The AWS account number used for the project."
 }
 #------------------------------------------------------------
-variable "certificate_arn" {
-  type        = string
-  description = "The ARN of the certificate used for HTTPS."
-}
 #domain cloudfront
 variable "domain" {
   type        = string

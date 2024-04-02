@@ -31,7 +31,7 @@ resource "aws_cloudfront_distribution" "my_distribution" {
   }
   viewer_certificate {
     cloudfront_default_certificate = false
-    acm_certificate_arn            = data.aws_acm_certificate.this.arn
+    acm_certificate_arn            = aws_acm_certificate.this.arn
     ssl_support_method             = "sni-only" #must be set; other options "vip" include extra charges because cf need to use a dedicated ip adress
   }
   enabled             = true

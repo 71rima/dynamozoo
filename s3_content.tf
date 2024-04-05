@@ -2,6 +2,13 @@ resource "aws_s3_bucket" "content" {
   bucket = var.s3_content_bucket_name
 }
 
+/*resource "aws_s3_bucket_public_access_block" "this" {
+   bucket = aws_s3_bucket.content.id
+
+   block_public_acls   = true
+   block_public_policy = true
+}*/
+
 resource "aws_s3_object" "image_scurr" {
   bucket       = aws_s3_bucket.content.id
   key          = "image_scurr.jpg"

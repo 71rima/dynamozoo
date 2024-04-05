@@ -6,7 +6,7 @@
         "Action": [
             "dynamodb:GetItem"
         ],
-        "Resource": "arn:aws:dynamodb:us-east-1:870615114862:table/*"
+        "Resource": "arn:aws:dynamodb:${region}:${account_id}:table/${dynamodb_table}"
     }
 ]
 }

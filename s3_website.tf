@@ -36,18 +36,18 @@ resource "aws_s3_bucket_website_configuration" "static_website" {
 resource "aws_s3_object" "index" {
   bucket       = aws_s3_bucket.static_website.id
   key          = "index.html"
-  source       = "${path.module}/website_src/DynamoZoo/index.html" #TODO: Variable oder so lassen?
+  source       = "${var.website_path}/index.html" #TODO: Variable oder so lassen? local
   content_type = "text/html"
 
-  etag = filemd5("${path.module}/website_src/DynamoZoo/index.html")
+  etag = filemd5("${var.website_path}/index.html")
 }
 resource "aws_s3_object" "error" {
   bucket       = aws_s3_bucket.static_website.id
   key          = "error.html"
-  source       = "${path.module}/website_src/DynamoZoo/error.html"
+  source       = "${var.website_path}/error.html"
   content_type = "text/html"
 
-  etag = filemd5("${path.module}/website_src/DynamoZoo/error.html")
+  etag = filemd5("${var.website_path}/error.html")
 }
 
 #policy for OAC read access

@@ -4,6 +4,10 @@ resource "aws_api_gateway_rest_api" "FileService" {
   endpoint_configuration {
     types = ["REGIONAL"]
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_resource" "animalResource" {
@@ -28,12 +32,32 @@ resource "aws_api_gateway_integration" "integration" {
   uri                     = aws_lambda_function.test_lambda.invoke_arn
 }
 
-resource "aws_api_gateway_stage" "dev" {
+resource "aws_api_gateway_stage" "this" {
   deployment_id = aws_api_gateway_deployment.this.id
   rest_api_id   = aws_api_gateway_rest_api.FileService.id
-  stage_name    = "Development"
+  stage_name    = var.environment
+
+  #cache_cluster_enabled = true #CKV_AWS_120 invalid stage cache size: null
+  xray_tracing_enabled = true # CKV_AWS_73
+  /*access_log_settings {        #CKV_AWS_76 
+    destination_arn = aws_cloudwatch_log_group.api_gateway_log_group.arn
+    format = jsonencode({
+      requestId               = "$context.requestId"
+      sourceIp                = "$context.identity.sourceIp"
+      requestTime             = "$context.requestTime"
+      protocol                = "$context.protocol"
+      httpMethod              = "$context.httpMethod"
+      resourcePath            = "$context.resourcePath"
+      routeKey                = "$context.routeKey"
+      status                  = "$context.status"
+      responseLength          = "$context.responseLength"
+      integrationErrorMessage = "$context.integrationErrorMessage"
+    })
+  }*/
 }
 
+
+#--------------------------------------------------------------------------------------
 resource "aws_api_gateway_deployment" "this" {
   rest_api_id = aws_api_gateway_rest_api.FileService.id
 
@@ -52,7 +76,7 @@ resource "aws_api_gateway_deployment" "this" {
       aws_api_gateway_resource.animalResource.id,
       aws_api_gateway_method.getAnimal.id,
       aws_api_gateway_integration.integration.id
-    
+
     ]))
   }
 
@@ -64,32 +88,22 @@ resource "aws_api_gateway_deployment" "this" {
 
 #Regional (ACM Certificate) for domain "api.web.elshennawy.de"
 resource "aws_api_gateway_domain_name" "this" {
-  domain_name              = "api.web.elshennawy.de"
+  domain_name              = var.api_domain
   regional_certificate_arn = aws_acm_certificate_validation.this.certificate_arn
 
   endpoint_configuration {
     types = ["REGIONAL"]
   }
-
+  security_policy = "TLS_1_2"
   #depends_on = [aws_acm_certificate_validation.this.certificate_arn]
-}
-
-#Route 53 DNS Record for domain "api.web.elshennawy.de"
-resource "aws_route53_record" "api_gateway_record" {
-  zone_id = data.aws_route53_zone.this.zone_id
-  name    = aws_api_gateway_domain_name.this.domain_name
-  type    = "A"
-
-  alias {
-    name                   = aws_api_gateway_domain_name.this.regional_domain_name
-    zone_id                = aws_api_gateway_domain_name.this.regional_zone_id
-    evaluate_target_health = true
-  }
 }
 
 # Base path mapping for domain "api.web.elshennawy.de"
 resource "aws_api_gateway_base_path_mapping" "this" {
   api_id      = aws_api_gateway_rest_api.FileService.id
-  stage_name  = aws_api_gateway_stage.dev.stage_name
+  stage_name  = aws_api_gateway_stage.this.stage_name
   domain_name = aws_api_gateway_domain_name.this.domain_name
 }
+
+
+#--------------------------------------------------------------------------------------

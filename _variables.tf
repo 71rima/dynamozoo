@@ -1,12 +1,10 @@
-#AWS specific configuration
-variable "region" {
+#Development Configuration
+variable "environment" {
   type        = string
-  description = "The AWS region used for the project."
+  description = "The environment used for the project."
+  default     = "dev"
 }
-variable "account_id" {
-  type        = string
-  description = "The AWS account number used for the project."
-}
+
 #------------------------------------------------------------
 #domain cloudfront
 variable "domain" {
@@ -14,20 +12,26 @@ variable "domain" {
   description = "The domain name of the website."
 }
 variable "domain_www" {
-   type        = string
+  type        = string
   description = "The domain name of the website including www."
 }
 #------------------------------------------------------------
+#api gateway
+variable "api_domain" {
+  type        = string
+  description = "The name of the API Gateway."
+}
+#------------------------------------------------------------
 #Backend
-variable "s3_statebucket" {
+variable "s3_state_bucket_name" {
   type        = string
   description = "The name of the s3 statebucket."
 }
-variable "s3_logsbucket" {
+variable "s3_logs_bucket_name" {
   type        = string
   description = "The name of the s3 cflogsbucket."
 }
-variable "dynamodb_statelock" {
+variable "dynamodb_state_lock_name" {
   type        = string
   description = "The name of the dynamodb table used for Terraform state lock."
 }
@@ -56,15 +60,18 @@ variable "dynamodb_table_name" {
   description = "The name of the dynamodb table used for Metadata."
 }
 #------------------------------------------------------------
+#templates path
+variable "templates_path" {
+  type        = string
+  description = "The path to the templates directory."
+}
+#website path
+variable "website_path" {
+  type        = string
+  description = "The path to the website directory."
+}
+#------------------------------------------------------------
 #Lambda
-variable "lambda_zip_file_name" {
-  type        = string
-  description = "The name of the lambda zip file."
-}
-variable "lambda_handler" {
-  type        = string
-  description = "The name of the lambda handler."
-}
 variable "lambda_function_name" {
   type        = string
   description = "The name of the lambda function."

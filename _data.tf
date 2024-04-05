@@ -19,17 +19,24 @@ data "archive_file" "lambda" {
 #current caller identity
 data "aws_caller_identity" "current" {}
 
+#current caller region
+data "aws_region" "current" {}
+
+#get default tags from provider
+data "aws_default_tags" "current" {}
+
 ## Backend
 
 #statestorage
-data "aws_s3_bucket" "this" {
-  bucket = var.s3_statebucket
+data "aws_s3_bucket" "tfstate" {
+  bucket = var.s3_state_bucket_name
 }
 #cf logs - bucket
 data "aws_s3_bucket" "logs" {
-  bucket = var.s3_logsbucket
+  bucket = var.s3_logs_bucket_name
 }
-#state dynamodb
+#state lock dynamodb
 data "aws_dynamodb_table" "statelock" {
-  name = var.dynamodb_statelock
+  name = var.dynamodb_state_lock_name
 }
+

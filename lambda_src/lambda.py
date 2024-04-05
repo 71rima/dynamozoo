@@ -69,6 +69,8 @@ def get_bucket_name_and_object_from_url(url):
     bucket_name = bucket_url.split('.')[0]
     object_name = '/'.join(parts[3:])
     return bucket_name, object_name
+    
+    #get the bucket name and object name from the URL
 
 def respond(err, res):
     status_code = 400 if err else 200

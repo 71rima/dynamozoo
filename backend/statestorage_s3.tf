@@ -7,14 +7,14 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_versioning" "this" {
-  bucket = aws_s3_bucket.this.bucket
+  bucket = aws_s3_bucket.tfstate.bucket
   versioning_configuration {
     status = "Enabled"
   }
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "this" {
-  bucket = aws_s3_bucket.this.bucket
+  bucket = aws_s3_bucket.tfstate.bucket
 
   rule {
     default_retention {
@@ -30,7 +30,7 @@ resource "aws_kms_key" "this" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
-  bucket = aws_s3_bucket.this.bucket
+  bucket = aws_s3_bucket.tfstate.bucket
 
   rule {
     apply_server_side_encryption_by_default {

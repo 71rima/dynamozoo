@@ -1,0 +1,94 @@
+#Github Action 1 - Update ENV_CONTEXT_TF_VERSION on a schedule
+name: Terraform Update Environment Version Action
+
+on:
+    schedule:
+        # * is special character in YAML so you have to quote this string
+        # On the first day of every month at 3:00 am
+        - cron: '0 3 1 * *'
+
+jobs:
+    Build:
+        runs-on: ubuntu-latest
+        outputs: 
+            output1: ${{steps.latest_version.outputs.latest_version}}
+            output1: ${{steps.compare_versions.outputs.version_match}}
+        environment:
+        env_var: ${{ vars.ENV_CONTEXT_TF_VERSION }}
+        steps:
+            - name: Check for latest Terraform Version
+            id: latest_version
+            run: | 
+              echo "Get Latest_Release."
+              LATEST_RELEASE=$(curl https://api.github.com/repos/hashicorp/terraform/releases/latest | jq --raw-output '.tag_name' | cut -c 2-) #from Nth byte to end (N=2 to cut v)
+              echo "Latest Release of Terraform is $LATEST_RELEASE."
+              echo "::set-output name=latest_version::$LATEST_RELEASE" 
+            
+            - name: Compare Version and Update Output
+            id: compare_versions
+            run: | 
+              echo "Comparing Versions..."
+              if [ "${{ env.ENV_CONTEXT_TF_VERSION }}" != "${{LATEST_RELEASE}}"]
+                echo "::set-output name=version_match::false"
+              else
+                echo "::set-output name=version_match::true"
+              fi
+
+            - name: Update Environment Variable if Versions don't match
+            id: update_env_var
+            if: steps.compare_versions.outputs.version_match == 'false'
+            run: |
+            echo "Updating Environment Variables to ${{steps.latest_version.outputs.latest_version}}"
+            echo "::set-env name=ENV_CONTEXT_TF_VERSION::${{ steps.latest_version.outputs.latest_version }}"
+
+  Build:
+    runs-on: ubuntu-latest
+    environment:
+      name: Staging
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:  
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with: 
+        terraform_version: 1.5
+
+    - name: Terraform init 
+      id: init
+      if: steps.isNotLatest.outputs == true
+      run: terraform init 
+
+    - name: Terraform init upgrade
+      id: init-upgrade
+      if: steps.isNotLatest.outputs == true
+      run: terraform init -upgrade
+
+    - name: Terraform get
+      id: get
+      if: steps.isNotLatest.outputs == true
+      run: terraform get -update 
+
+    - name: Terraform format
+      id: fmt
+      if: steps.isNotLatest.outputs == true
+      run: terraform fmt
+
+    - name: Terraform validate
+      id: validate
+      if: steps.isNotLatest.outputs == true
+      run: terraform validate
+
+    - name: Terraform plan
+      id: plan
+      if: steps.isNotLatest.outputs == true
+      run: terraform plan
+
+  # send email if e.g. via https://github.com/marketplace/actions/send-email

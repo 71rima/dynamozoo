@@ -1,6 +1,6 @@
 #Configure backend configuration
 terraform {
-  required_version = ">= 1.7"
+  required_version = ">= 0.1"
   backend "s3" {
     bucket         = "tfstate-dynamozoo1232523"
     key            = "terraform.tfstate"
@@ -10,7 +10,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.41"
+      version = "4.41"
     }
   }
 }
